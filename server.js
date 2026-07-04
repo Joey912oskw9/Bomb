@@ -6,85 +6,95 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// دیتابیس موقت (در حافظه) - برای Railway کاملا مناسب است
-let usersDB = [];
+// دیتابیس موقت (در حافظه سرور)
+let db = {
+    users: [],
+    inbounds: [
+        { id: 1, protocol: "VLESS", port: 443, remark: "VLESS_TCP_TLS" },
+        { id: 2, protocol: "VMess", port: 8080, remark: "VMess_WS" },
+        { id: 3, protocol: "Trojan", port: 8443, remark: "Trojan_TCP" }
+    ]
+};
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// میان‌بر برنامه‌نویسی برای احراز هویت ساده
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin"; // تو Railway می‌تونی اینا رو تغییر بدی
+// --- روت‌های API ---
 
-// API: ورود به پنل
+// صفحه سابسکریپشن (مثل مرزبان لینک sub میده)
+app.get('/sub/:token', (req, res) => {
+    const user = db.users.find(u => u.sub_token === req.params.token);
+    if (!user) return res.status(404).send('User not found');
+    
+    // فرمت سابسکریپشن (Base64)
+    const subContent = Buffer.from(user.links.join('\n')).toString('base64');
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(subContent);
+});
+
+// لاگین
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
-        res.json({ success: true, token: "fake-jwt-token-123" });
+    if (username === 'admin' && password === 'admin') {
+        res.json({ success: true });
     } else {
-        res.status(401).json({ success: false, message: "نام کاربری یا رمز عبور اشتباه است" });
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 });
 
-// API: گرفتن آمار داشبورد
+// گرفتن آمار
 app.get('/api/stats', (req, res) => {
     res.json({
-        totalUsers: usersDB.length,
-        activeUsers: usersDB.filter(u => u.status === 'active').length,
-        totalTraffic: usersDB.reduce((acc, u) => acc + (u.usedTraffic || 0), 0),
-        totalLimit: usersDB.reduce((acc, u) => acc + (u.dataLimit || 0), 0)
+        users: db.users.length,
+        active: db.users.filter(u => u.status === 'active').length,
+        online: Math.floor(Math.random() * 5), // شبیه‌سازی کاربر آنلاین
+        totalBandwidth: db.users.reduce((a, b) => a + b.used_bytes, 0)
     });
 });
 
-// API: گرفتن لیست کاربران
-app.get('/api/users', (req, res) => {
-    res.json(usersDB);
-});
+// لیست کاربران
+app.get('/api/users', (req, res) => res.json(db.users));
 
-// API: ساخت کاربر و کانفیگ جدید
+// ساخت کاربر جدید
 app.post('/api/users', async (req, res) => {
-    const { name, host, path, sni, dataLimit, expireDays } = req.body;
-    
-    if (!name || !host) {
-        return res.status(400).json({ error: 'اسم و آدرس سرور (Host) الزامی است' });
-    }
+    const { name, data_limit_gb, expire_days } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name required' });
 
     const uuid = crypto.randomUUID();
-    const expireDate = expireDays > 0 ? new Date(Date.now() + expireDays * 24 * 60 * 60 * 1000).toISOString() : null;
-    
-    const vlessLink = `vless://${uuid}@${host}:443?type=ws&security=tls&path=${encodeURIComponent(path || '/')}&host=${sni || host}&sni=${sni || host}#${encodeURIComponent(name)}`;
-    
+    const sub_token = crypto.randomBytes(8).toString('hex');
+    const host = req.headers.host; // دامنه خود ریلی
+
+    // تولید لینک‌ها برای این کاربر
+    const links = [
+        `vless://${uuid}@${host}:443?type=tcp&security=tls#${name}`,
+        `vmess://${Buffer.from(JSON.stringify({ v: "2", ps: name, add: host, port: "8080", id: uuid, aid: "0", net: "ws", type: "none", host: "", path: "/", tls: "" })).toString('base64')}`
+    ];
+
     const newUser = {
         id: crypto.randomBytes(4).toString('hex'),
         name,
         uuid,
-        vlessLink,
+        sub_token,
+        links,
+        sub_url: `https://${host}/sub/${sub_token}`,
         status: 'active',
-        dataLimit: dataLimit || 0, // به گیگابایت
-        usedTraffic: Math.floor(Math.random() * 1000), // ترافیک تستی
-        expireDate,
-        createdAt: new Date().toISOString()
+        data_limit_bytes: (data_limit_gb || 0) * 1024 * 1024 * 1024,
+        used_bytes: Math.floor(Math.random() * 500 * 1024 * 1024), // ترافیک تستی
+        expire_at: expire_days > 0 ? new Date(Date.now() + expire_days * 86400000).toISOString() : null,
+        created_at: new Date().toISOString()
     };
 
-    usersDB.push(newUser);
+    db.users.push(newUser);
     res.json({ success: true, user: newUser });
 });
 
-// API: حذف کاربر
+// حذف کاربر
 app.delete('/api/users/:id', (req, res) => {
-    usersDB = usersDB.filter(u => u.id !== req.params.id);
+    db.users = db.users.filter(u => u.id !== req.params.id);
     res.json({ success: true });
 });
 
-// API: گرفتن QR Code
-app.get('/api/qr/:id', async (req, res) => {
-    const user = usersDB.find(u => u.id === req.params.id);
-    if (!user) return res.status(404).json({ error: 'Not found' });
-    
-    const qr = await QRCode.toDataURL(user.vlessLink, { width: 200, margin: 1 });
-    res.json({ qr });
-});
+// لیست Inbounds
+app.get('/api/inbounds', (req, res) => res.json(db.inbounds));
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Professional Panel running on port ${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', () => console.log(`Marzban Clone running on ${PORT}`));
