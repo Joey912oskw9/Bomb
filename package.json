@@ -1,7 +1,7 @@
 {
-  "name": "vless-bomb-panel",
+  "name": "pro-vless-panel",
   "version": "1.0.0",
-  "description": "A cyberpunk style VLESS panel generator for Railway",
+  "description": "Professional VLESS Panel like Marzban/3x-ui",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
