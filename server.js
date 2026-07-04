@@ -1,51 +1,90 @@
 const express = require('express');
 const QRCode = require('qrcode');
-const path = require('path');
 const crypto = require('crypto');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// دیتابیس موقت (در حافظه) - برای Railway کاملا مناسب است
+let usersDB = [];
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API برای ساخت کانفیگ VLESS
-app.post('/api/generate', async (req, res) => {
-    try {
-        const { uuid, host, path, sni, remark } = req.body;
+// میان‌بر برنامه‌نویسی برای احراز هویت ساده
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin"; // تو Railway می‌تونی اینا رو تغییر بدی
 
-        if (!uuid || !host) {
-            return res.status(400).json({ error: 'UUID and Host are required!' });
-        }
-
-        // ساخت لینک VLESS WebSocket + TLS
-        const vlessLink = `vless://${uuid}@${host}:443?type=ws&security=tls&path=${encodeURIComponent(path || '/')}&host=${sni || host}&sni=${sni || host}#${encodeURIComponent(remark || 'BombConfig')}`;
-        
-        // ساخت QR Code در Base64
-        const qrCodeData = await QRCode.toDataURL(vlessLink, { 
-            width: 300,
-            margin: 1,
-            color: {
-                dark: '#00ff00',
-                light: '#00000000' // شفاف
-            }
-        });
-
-        res.json({
-            success: true,
-            vlessLink,
-            qrCode: qrCodeData
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Server Error: ' + error.message });
+// API: ورود به پنل
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        res.json({ success: true, token: "fake-jwt-token-123" });
+    } else {
+        res.status(401).json({ success: false, message: "نام کاربری یا رمز عبور اشتباه است" });
     }
 });
 
-// رندم UUID ژنراتور (در صورت نیاز)
-app.get('/api/uuid', (req, res) => {
-    res.json({ uuid: crypto.randomUUID() });
+// API: گرفتن آمار داشبورد
+app.get('/api/stats', (req, res) => {
+    res.json({
+        totalUsers: usersDB.length,
+        activeUsers: usersDB.filter(u => u.status === 'active').length,
+        totalTraffic: usersDB.reduce((acc, u) => acc + (u.usedTraffic || 0), 0),
+        totalLimit: usersDB.reduce((acc, u) => acc + (u.dataLimit || 0), 0)
+    });
+});
+
+// API: گرفتن لیست کاربران
+app.get('/api/users', (req, res) => {
+    res.json(usersDB);
+});
+
+// API: ساخت کاربر و کانفیگ جدید
+app.post('/api/users', async (req, res) => {
+    const { name, host, path, sni, dataLimit, expireDays } = req.body;
+    
+    if (!name || !host) {
+        return res.status(400).json({ error: 'اسم و آدرس سرور (Host) الزامی است' });
+    }
+
+    const uuid = crypto.randomUUID();
+    const expireDate = expireDays > 0 ? new Date(Date.now() + expireDays * 24 * 60 * 60 * 1000).toISOString() : null;
+    
+    const vlessLink = `vless://${uuid}@${host}:443?type=ws&security=tls&path=${encodeURIComponent(path || '/')}&host=${sni || host}&sni=${sni || host}#${encodeURIComponent(name)}`;
+    
+    const newUser = {
+        id: crypto.randomBytes(4).toString('hex'),
+        name,
+        uuid,
+        vlessLink,
+        status: 'active',
+        dataLimit: dataLimit || 0, // به گیگابایت
+        usedTraffic: Math.floor(Math.random() * 1000), // ترافیک تستی
+        expireDate,
+        createdAt: new Date().toISOString()
+    };
+
+    usersDB.push(newUser);
+    res.json({ success: true, user: newUser });
+});
+
+// API: حذف کاربر
+app.delete('/api/users/:id', (req, res) => {
+    usersDB = usersDB.filter(u => u.id !== req.params.id);
+    res.json({ success: true });
+});
+
+// API: گرفتن QR Code
+app.get('/api/qr/:id', async (req, res) => {
+    const user = usersDB.find(u => u.id === req.params.id);
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    
+    const qr = await QRCode.toDataURL(user.vlessLink, { width: 200, margin: 1 });
+    res.json({ qr });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`💥 BOMB PANEL is running on port ${PORT}`);
+    console.log(`Professional Panel running on port ${PORT}`);
 });
