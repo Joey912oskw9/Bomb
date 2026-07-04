@@ -1,7 +1,7 @@
 {
-  "name": "pro-vless-panel",
+  "name": "marzban-clone-panel",
   "version": "1.0.0",
-  "description": "Professional VLESS Panel like Marzban/3x-ui",
+  "description": "Professional Marzban style panel for Railway",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
