@@ -3,444 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOMB VLESS GENERATOR | V2RAY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>V2RAY PRO PANEL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-green: #00ff9d;
-            --neon-pink: #ff0055;
-            --neon-blue: #00e5ff;
-            --bg-dark: #050505;
-            --glass: rgba(15, 15, 15, 0.6);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: var(--bg-dark);
-            color: #fff;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* بک‌گراند ذرات */
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* افکت گلیچ برای تایتل */
-        .glitch-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3.5rem;
-            font-weight: 900;
-            text-align: center;
-            margin: 40px 0;
-            text-transform: uppercase;
-            position: relative;
-            color: #fff;
-            text-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        .glitch-title::before,
-        .glitch-title::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .glitch-title::before {
-            left: 2px;
-            text-shadow: -2px 0 var(--neon-pink);
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-1 2s infinite linear alternate-reverse;
-        }
-
-        .glitch-title::after {
-            left: -2px;
-            text-shadow: -2px 0 var(--neon-green);
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-2 3s infinite linear alternate-reverse;
-        }
-
-        @keyframes glitch-1 {
-            0% { clip: rect(10px, 9999px, 13px, 0); }
-            20% { clip: rect(50px, 9999px, 100px, 0); }
-            40% { clip: rect(20px, 9999px, 50px, 0); }
-            60% { clip: rect(80px, 9999px, 120px, 0); }
-            80% { clip: rect(40px, 9999px, 80px, 0); }
-            100% { clip: rect(10px, 9999px, 30px, 0); }
-        }
-
-        @keyframes glitch-2 {
-            0% { clip: rect(110px, 9999px, 130px, 0); }
-            20% { clip: rect(150px, 9999px, 180px, 0); }
-            40% { clip: rect(120px, 9999px, 160px, 0); }
-            60% { clip: rect(190px, 9999px, 210px, 0); }
-            80% { clip: rect(130px, 9999px, 170px, 0); }
-            100% { clip: rect(100px, 9999px, 120px, 0); }
-        }
-
-        /* کانتینر اصلی گلس */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 255, 157, 0.2);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 255, 157, 0.1), inset 0 0 20px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* خطوط نئونی دور پنل */
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink));
-            z-index: -1;
-            border-radius: 15px;
-            filter: blur(5px);
-            opacity: 0.5;
-            animation: borderGlow 4s linear infinite;
-        }
-
-        @keyframes borderGlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            color: var(--neon-green);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid #333;
-            border-radius: 5px;
-            color: #fff;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-
-        .btn-generate {
-            width: 100%;
-            padding: 15px;
-            background: transparent;
-            border: 2px solid var(--neon-pink);
-            color: var(--neon-pink);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .btn-generate:hover {
-            background: var(--neon-pink);
-            color: #000;
-            box-shadow: 0 0 25px var(--neon-pink);
-            text-shadow: 0 0 5px #000;
-        }
-
-        /* بخش خروجی */
-        .output-section {
-            margin-top: 30px;
-            display: none;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .link-box {
-            background: rgba(0,0,0,0.8);
-            border: 1px dashed var(--neon-blue);
-            padding: 15px;
-            border-radius: 5px;
-            word-break: break-all;
-            color: var(--neon-green);
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .btn-copy {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: var(--neon-blue);
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 3px;
-        }
-
-        .qr-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .qr-container img {
-            border: 5px solid #fff;
-            border-radius: 10px;
-            background: #fff;
-            padding: 5px;
-            box-shadow: 0 0 20px var(--neon-green);
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--neon-green);
-            color: #000;
-            padding: 15px 25px;
-            border-radius: 5px;
-            font-weight: bold;
-            display: none;
-            box-shadow: 0 0 20px var(--neon-green);
-            z-index: 9999;
-        }
-
-        /* اسکنر لاین انیمیشن هنگام لودینگ */
-        .scanner {
-            width: 100%;
-            height: 2px;
-            background: var(--neon-green);
-            display: none;
-            margin: 10px 0;
-            box-shadow: 0 0 15px var(--neon-green);
-            animation: scan 1s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .table-row:hover { background-color: rgba(51, 65, 85, 0.3); }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden">
 
-    <canvas id="bg-canvas"></canvas>
+    <!-- سایدبار -->
+    <aside class="w-64 bg-slate-900 border-l border-slate-800 flex flex-col">
+        <div class="p-6 text-center border-b border-slate-800">
+            <h1 class="text-2xl font-extrabold text-blue-400 tracking-wider">V2RAY PRO</h1>
+            <p class="text-xs text-slate-500 mt-1">Management Panel</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="showPage('dashboard')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800 text-blue-400 font-medium transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                داشبورد
+            </button>
+            <button onclick="showPage('users')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                کاربران
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-800 text-xs text-slate-600 text-center">
+            Powered by Node.js | v1.0
+        </div>
+    </aside>
 
-    <div class="container">
-        <h1 class="glitch-title" data-text="BOMB VLESS PANEL">BOMB VLESS PANEL</h1>
+    <!-- محتوای اصلی -->
+    <main class="flex-1 overflow-y-auto p-8">
         
-        <div class="glass-panel">
-            <div class="input-group">
-                <label for="uuid">UUID</label>
-                <input type="text" id="uuid" placeholder="Example: 8b8b8b8b-8b8b-8b8b-8b8b-8b8b8b8b8b8b">
+        <!-- هدر بالای صفحه -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h2 id="page-title" class="text-3xl font-bold text-white">داشبورد</h2>
+                <p class="text-slate-500 mt-1 text-sm">نمای کلی سیستم و وضعیت کاربران</p>
             </div>
-
-            <div class="input-group">
-                <label for="host">Host / IP</label>
-                <input type="text" id="host" placeholder="example.com یا IP سرور">
+            <div class="flex items-center gap-4">
+                <button onclick="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    کاربر جدید
+                </button>
             </div>
+        </header>
 
-            <div class="input-group">
-                <label for="sni">SNI (اختیاری)</label>
-                <input type="text" id="sni" placeholder="همون Host رو بزن">
+        <!-- صفحه داشبورد -->
+        <div id="page-dashboard" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="glass p-6 rounded-xl">
+                <p class="text-slate-400 text-sm mb-2">کل کاربران</p>
+                <h3 id="stat-total" class="text-4xl font-bold text-white">0</h3>
             </div>
-
-            <div class="input-group">
-                <label for="path">Path (مسیر)</label>
-                <input type="text" id="path" placeholder="مثال: /vless">
+            <div class="glass p-6 rounded-xl">
+                <p class="text-slate-400 text-sm mb-2">کاربران فعال</p>
+                <h3 id="stat-active" class="text-4xl font-bold text-emerald-500">0</h3>
             </div>
-
-            <div class="input-group">
-                <label for="remark">Remark (اسم کانفیگ)</label>
-                <input type="text" id="remark" placeholder="مثال: BombConfig">
+            <div class="glass p-6 rounded-xl">
+                <p class="text-slate-400 text-sm mb-2">ترافیک مصرف شده (GB)</p>
+                <h3 id="stat-used" class="text-4xl font-bold text-amber-500">0</h3>
             </div>
+            <div class="glass p-6 rounded-xl">
+                <p class="text-slate-400 text-sm mb-2">مجموع محدودیت (GB)</p>
+                <h3 id="stat-limit" class="text-4xl font-bold text-blue-500">0</h3>
+            </div>
+        </div>
 
-            <div class="scanner" id="scanner"></div>
+        <!-- جدول کاربران -->
+        <div class="glass rounded-xl overflow-hidden">
+            <table class="w-full text-right">
+                <thead class="bg-slate-800/50 text-slate-400 text-sm">
+                    <tr>
+                        <th class="p-4 font-medium">نام کاربر</th>
+                        <th class="p-4 font-medium">UUID</th>
+                        <th class="p-4 font-medium">وضعیت</th>
+                        <th class="p-4 font-medium">ترافیک</th>
+                        <th class="p-4 font-medium">انقضا</th>
+                        <th class="p-4 font-medium">عملیات</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table" class="divide-y divide-slate-800">
+                    <!-- ردیف‌ها با جاوااسکریپت پر میشن -->
+                </tbody>
+            </table>
+        </div>
 
-            <button class="btn-generate" id="generateBtn">GENERATE BOMB</button>
+    </main>
 
-            <div class="output-section" id="outputSection">
-                <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Config Output:</h3>
-                <div class="link-box" id="linkBox">
-                    <button class="btn-copy" onclick="copyLink()">COPY</button>
-                    <span id="vlessLink"></span>
+    <!-- مودال ساخت کاربر -->
+    <div id="create-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass rounded-2xl p-8 w-full max-w-md border border-slate-700 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-6">ساخت کانفیگ جدید</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">نام / آیدی</label>
+                    <input id="c-name" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 text-white" placeholder="مثلا: ali_vip">
                 </div>
-                <div class="qr-container">
-                    <img id="qrImage" src="" alt="QR Code">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">آدرس سرور (Host/Domain)</label>
+                    <input id="c-host" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 text-white" placeholder="example.com">
                 </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1">Path (مسیر)</label>
+                    <input id="c-path" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 text-white" placeholder="/vless">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">حجم (GB)</label>
+                        <input id="c-limit" type="number" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-400 mb-1">مدت (روز)</label>
+                        <input id="c-expire" type="number" value="30" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 text-white">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="createUser()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition">ساخت کانفیگ</button>
+                <button onclick="closeCreateModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-medium transition">انصراف</button>
             </div>
         </div>
     </div>
 
-    <div class="toast" id="toast">Copied to clipboard!</div>
+    <!-- مودال نمایش لینک و QR -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass rounded-2xl p-8 w-full max-w-md border border-slate-700 shadow-2xl text-center">
+            <h3 class="text-xl font-bold text-white mb-4">کانفیگ ساخته شد</h3>
+            <img id="qr-image" src="" alt="QR Code" class="w-48 h-48 mx-auto rounded-lg mb-4 bg-white p-2">
+            <div class="bg-slate-900 p-3 rounded-lg flex items-center gap-2 mb-4">
+                <p id="vless-text" class="text-xs text-emerald-400 break-all flex-1 text-left" dir="ltr"></p>
+                <button onclick="copyLink()" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs">کپی</button>
+            </div>
+            <button onclick="closeQrModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg font-medium transition">بستن</button>
+        </div>
+    </div>
 
     <script>
-        // --- سیستم ذرات بک‌گراند ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 255, 157, 0.8)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        // --- توابع مدیریت UI ---
+        function showPage(page) {
+            document.getElementById('page-title').innerText = page === 'dashboard' ? 'داشبورد' : 'مدیریت کاربران';
+            // فعلا هر دو صفحه یک جدول رو نشون میدن، در آینده میشه تفکیک کرد
         }
 
-        function initParticles() {
-            particles = [];
-            for(let i=0; i<70; i++) {
-                particles.push(new Particle());
-            }
+        function openCreateModal() {
+            document.getElementById('create-modal').style.display = 'flex';
+        }
+        function closeCreateModal() {
+            document.getElementById('create-modal').style.display = 'none';
+        }
+        function closeQrModal() {
+            document.getElementById('qr-modal').style.display = 'none';
         }
 
-        function connectParticles() {
-            let maxDist = 120;
-            for(let a=0; a<particles.length; a++){
-                for(let b=a; b<particles.length; b++){
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < maxDist){
-                        ctx.strokeStyle = `rgba(0, 229, 255, ${1 - dist/maxDist})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
+        // --- توابع ارتباط با بک‌اند ---
+        async function fetchStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            document.getElementById('stat-total').innerText = data.totalUsers;
+            document.getElementById('stat-active').innerText = data.activeUsers;
+            // تبدیل مگابایت به گیگابایت (فرضی)
+            document.getElementById('stat-used').innerText = (data.totalTraffic / 1024).toFixed(2);
+            document.getElementById('stat-limit').innerText = data.totalLimit;
         }
 
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            connectParticles();
-            requestAnimationFrame(animateParticles);
+        async function fetchUsers() {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const tbody = document.getElementById('users-table');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = `
+                    <tr class="table-row transition-colors">
+                        <td class="p-4 font-medium text-white">${user.name}</td>
+                        <td class="p-4 text-slate-400 text-xs font-mono">${user.uuid.substring(0, 8)}...</td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 text-xs rounded-full ${user.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}">
+                                ${user.status === 'active' ? 'فعال' : 'غیرفعال'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-slate-300 text-sm">${(user.usedTraffic / 1024).toFixed(2)} / ${user.dataLimit} GB</td>
+                        <td class="p-4 text-slate-300 text-sm">${user.expireDate ? new Date(user.expireDate).toLocaleDateString('fa-IR') : 'نامحدود'}</td>
+                        <td class="p-4">
+                            <div class="flex gap-2">
+                                <button onclick="showQr('${user.id}')" class="bg-slate-700 hover:bg-blue-600 p-2 rounded transition" title="مشاهده لینک">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </button>
+                                <button onclick="deleteUser('${user.id}')" class="bg-slate-700 hover:bg-red-600 p-2 rounded transition" title="حذف">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         }
 
-        initParticles();
-        animateParticles();
+        async function createUser() {
+            const name = document.getElementById('c-name').value;
+            const host = document.getElementById('c-host').value;
+            const path = document.getElementById('c-path').value || '/';
+            const dataLimit = parseInt(document.getElementById('c-limit').value) || 0;
+            const expireDays = parseInt(document.getElementById('c-expire').value) || 0;
 
-        // --- سیستم تولید کانفیگ ---
-        const generateBtn = document.getElementById('generateBtn');
-        const scanner = document.getElementById('scanner');
-        const outputSection = document.getElementById('outputSection');
-
-        generateBtn.addEventListener('click', async () => {
-            const uuid = document.getElementById('uuid').value.trim();
-            const host = document.getElementById('host').value.trim();
-            const sni = document.getElementById('sni').value.trim();
-            const path = document.getElementById('path').value.trim();
-            const remark = document.getElementById('remark').value.trim();
-
-            if(!uuid || !host) {
-                alert('UUID و Host الزامی هستند!');
+            if(!name || !host) {
+                alert('نام و آدرس سرور الزامی است');
                 return;
             }
 
-            scanner.style.display = 'block';
-            generateBtn.disabled = true;
-            generateBtn.innerText = 'GENERATING...';
+            const res = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, host, path, dataLimit, expireDays })
+            });
+            const data = await res.json();
 
-            try {
-                const response = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ uuid, host, sni, path, remark })
-                });
-                const data = await response.json();
-
-                if(data.success) {
-                    document.getElementById('vlessLink').innerText = data.vlessLink;
-                    document.getElementById('qrImage').src = data.qrCode;
-                    outputSection.style.display = 'block';
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            } catch (error) {
-                alert('Error connecting to server!');
-            } finally {
-                scanner.style.display = 'none';
-                generateBtn.disabled = false;
-                generateBtn.innerText = 'GENERATE BOMB';
+            if(data.success) {
+                closeCreateModal();
+                showQr(data.user.id);
+                fetchUsers();
+                fetchStats();
+                
+                // ریست کردن فرم
+                document.getElementById('c-name').value = '';
+                document.getElementById('c-host').value = '';
+            } else {
+                alert('خطا در ساخت کاربر');
             }
-        });
+        }
+
+        async function deleteUser(id) {
+            if(confirm('آیا از حذف این کاربر مطمئن هستید؟')) {
+                await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                fetchUsers();
+                fetchStats();
+            }
+        }
+
+        async function showQr(id) {
+            const res = await fetch(`/api/qr/${id}`);
+            const data = await res.json();
+            
+            // پیدا کردن لینک کاربر
+            const userRes = await fetch('/api/users');
+            const users = await userRes.json();
+            const user = users.find(u => u.id === id);
+            
+            document.getElementById('qr-image').src = data.qr;
+            document.getElementById('vless-text').innerText = user.vlessLink;
+            document.getElementById('qr-modal').style.display = 'flex';
+        }
 
         function copyLink() {
-            const text = document.getElementById('vlessLink').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.getElementById('toast');
-                toast.style.display = 'block';
-                setTimeout(() => { toast.style.display = 'none'; }, 2000);
-            });
+            const text = document.getElementById('vless-text').innerText;
+            navigator.clipboard.writeText(text);
+            alert('لینک کپی شد!');
         }
+
+        // لود اولیه اطلاعات هنگام باز شدن سایت
+        fetchUsers();
+        fetchStats();
     </script>
 </body>
-  </html>
+                    </html>
