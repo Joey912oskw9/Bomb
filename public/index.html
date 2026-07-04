@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOMB VLESS GENERATOR | V2RAY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff9d;
+            --neon-pink: #ff0055;
+            --neon-blue: #00e5ff;
+            --bg-dark: #050505;
+            --glass: rgba(15, 15, 15, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg-dark);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* بک‌گراند ذرات */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* افکت گلیچ برای تایتل */
+        .glitch-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin: 40px 0;
+            text-transform: uppercase;
+            position: relative;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .glitch-title::before,
+        .glitch-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-title::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-pink);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-title::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-green);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-1 {
+            0% { clip: rect(10px, 9999px, 13px, 0); }
+            20% { clip: rect(50px, 9999px, 100px, 0); }
+            40% { clip: rect(20px, 9999px, 50px, 0); }
+            60% { clip: rect(80px, 9999px, 120px, 0); }
+            80% { clip: rect(40px, 9999px, 80px, 0); }
+            100% { clip: rect(10px, 9999px, 30px, 0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip: rect(110px, 9999px, 130px, 0); }
+            20% { clip: rect(150px, 9999px, 180px, 0); }
+            40% { clip: rect(120px, 9999px, 160px, 0); }
+            60% { clip: rect(190px, 9999px, 210px, 0); }
+            80% { clip: rect(130px, 9999px, 170px, 0); }
+            100% { clip: rect(100px, 9999px, 120px, 0); }
+        }
+
+        /* کانتینر اصلی گلس */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 157, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.1), inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* خطوط نئونی دور پنل */
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink));
+            z-index: -1;
+            border-radius: 15px;
+            filter: blur(5px);
+            opacity: 0.5;
+            animation: borderGlow 4s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: var(--neon-green);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-generate:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-pink);
+            text-shadow: 0 0 5px #000;
+        }
+
+        /* بخش خروجی */
+        .output-section {
+            margin-top: 30px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .link-box {
+            background: rgba(0,0,0,0.8);
+            border: 1px dashed var(--neon-blue);
+            padding: 15px;
+            border-radius: 5px;
+            word-break: break-all;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .btn-copy {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .qr-container img {
+            border: 5px solid #fff;
+            border-radius: 10px;
+            background: #fff;
+            padding: 5px;
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--neon-green);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 0 20px var(--neon-green);
+            z-index: 9999;
+        }
+
+        /* اسکنر لاین انیمیشن هنگام لودینگ */
+        .scanner {
+            width: 100%;
+            height: 2px;
+            background: var(--neon-green);
+            display: none;
+            margin: 10px 0;
+            box-shadow: 0 0 15px var(--neon-green);
+            animation: scan 1s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <h1 class="glitch-title" data-text="BOMB VLESS PANEL">BOMB VLESS PANEL</h1>
+        
+        <div class="glass-panel">
+            <div class="input-group">
+                <label for="uuid">UUID</label>
+                <input type="text" id="uuid" placeholder="Example: 8b8b8b8b-8b8b-8b8b-8b8b-8b8b8b8b8b8b">
+            </div>
+
+            <div class="input-group">
+                <label for="host">Host / IP</label>
+                <input type="text" id="host" placeholder="example.com یا IP سرور">
+            </div>
+
+            <div class="input-group">
+                <label for="sni">SNI (اختیاری)</label>
+                <input type="text" id="sni" placeholder="همون Host رو بزن">
+            </div>
+
+            <div class="input-group">
+                <label for="path">Path (مسیر)</label>
+                <input type="text" id="path" placeholder="مثال: /vless">
+            </div>
+
+            <div class="input-group">
+                <label for="remark">Remark (اسم کانفیگ)</label>
+                <input type="text" id="remark" placeholder="مثال: BombConfig">
+            </div>
+
+            <div class="scanner" id="scanner"></div>
+
+            <button class="btn-generate" id="generateBtn">GENERATE BOMB</button>
+
+            <div class="output-section" id="outputSection">
+                <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Config Output:</h3>
+                <div class="link-box" id="linkBox">
+                    <button class="btn-copy" onclick="copyLink()">COPY</button>
+                    <span id="vlessLink"></span>
+                </div>
+                <div class="qr-container">
+                    <img id="qrImage" src="" alt="QR Code">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <script>
+        // --- سیستم ذرات بک‌گراند ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 255, 157, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for(let i=0; i<70; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            let maxDist = 120;
+            for(let a=0; a<particles.length; a++){
+                for(let b=a; b<particles.length; b++){
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < maxDist){
+                        ctx.strokeStyle = `rgba(0, 229, 255, ${1 - dist/maxDist})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            connectParticles();
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        // --- سیستم تولید کانفیگ ---
+        const generateBtn = document.getElementById('generateBtn');
+        const scanner = document.getElementById('scanner');
+        const outputSection = document.getElementById('outputSection');
+
+        generateBtn.addEventListener('click', async () => {
+            const uuid = document.getElementById('uuid').value.trim();
+            const host = document.getElementById('host').value.trim();
+            const sni = document.getElementById('sni').value.trim();
+            const path = document.getElementById('path').value.trim();
+            const remark = document.getElementById('remark').value.trim();
+
+            if(!uuid || !host) {
+                alert('UUID و Host الزامی هستند!');
+                return;
+            }
+
+            scanner.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.innerText = 'GENERATING...';
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uuid, host, sni, path, remark })
+                });
+                const data = await response.json();
+
+                if(data.success) {
+                    document.getElementById('vlessLink').innerText = data.vlessLink;
+                    document.getElementById('qrImage').src = data.qrCode;
+                    outputSection.style.display = 'block';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error connecting to server!');
+            } finally {
+                scanner.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.innerText = 'GENERATE BOMB';
+            }
+        });
+
+        function copyLink() {
+            const text = document.getElementById('vlessLink').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2000);
+            });
+        }
+    </script>
+</body>
+  </html>
